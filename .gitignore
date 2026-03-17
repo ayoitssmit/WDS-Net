@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch weights and checkpoints
+*.pth
+*.pt
+*.ckpt
+
+# Output figures
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# MacOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Custom Datasets
+digit_data/
+charater_data/
