@@ -66,7 +66,7 @@ To begin training, execute the `main.py` script and provide the paths to your tr
 
 **Basic Training Command**:
 ```bash
-python main.py --train_dirs "path/to/Dataset1/Train" "path/to/Dataset2/Train" --test_dirs "path/to/Dataset1/Test" "path/to/Dataset2/Test"
+python main.py --train_dirs "path/to/Dataset/Train" --test_dirs "path/to/Dataset/Test"
 ```
 
 **Optional Hyperparameters and Settings**:
