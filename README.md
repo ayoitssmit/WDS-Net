@@ -4,7 +4,7 @@ WDS-Net is a general-purpose, PyTorch-based Deep Learning framework designed for
 
 While originally tailored for Devanagari characters and Hindi-MNIST numerals, the framework is generalized to train on **any image dataset**.
 
-## 🌟 Key Features
+## Key Features
 - **Parallel Feature Disentanglement**:
   - **Spatial Path**: Extracts scale-invariant features via Deep CNNs and Max Pooling.
   - **Structural Path**: Captures sequential dependencies (stroke orders/structural relationships) using an LSTM over the Convoluted feature slices.
@@ -14,32 +14,37 @@ While originally tailored for Devanagari characters and Hindi-MNIST numerals, th
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
-### 1. Requirements
+### 1. System Requirements
 
-Ensure you have Python 3.8+ installed. 
+Ensure you have Python 3.8 or higher installed on your system. 
 
 **For GPU Acceleration (Strongly Recommended)**:
-You must install the version of PyTorch compiled for CUDA. If you currently have the CPU version installed, uninstall it first:
+To utilize your NVIDIA GPU for significantly faster training, you must install the version of PyTorch compiled for CUDA. 
+
+If you currently have the default CPU-only version installed, you must uninstall it first:
 ```bash
 pip uninstall torch torchvision torchaudio
 ```
-Then install the GPU-enabled version (defaulting to CUDA 11.8):
+
+Then, install the GPU-enabled version. The following command installs the version built for CUDA 11.8, which is highly compatible with most modern NVIDIA GPUs:
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
 **Install Remaining Dependencies**:
+Run the following command to install the required data processing and visualization libraries:
 ```bash
 pip install numpy opencv-python scikit-learn matplotlib seaborn tqdm
 ```
 
-### 2. Preparing Your Dataset
+### 2. Dataset Preparation
 
-The `UniversalDataset` loader is designed to automatically infer classes from your directory structure. You can supply multiple root directories (e.g., combining characters and digits).
+The `UniversalDataset` loader is designed to automatically infer classes from your directory structure. You can supply multiple root directories simultaneously (for example, combining characters and digits from different sources).
 
 **Expected Directory Structure**:
+Your data must be organized into separate folders for each class within a split directory:
 ```text
 your_dataset_path/
 ├── Train/
@@ -53,46 +58,51 @@ your_dataset_path/
     ├── class_B/
     └── class_C/
 ```
-*Note: The script handles image resizing (defaults to 28x28), grayscale conversion, denoising (Gaussian Blur), and normalization automatically.*
+*Note: The dataset script automatically handles image resizing (defaults to 28x28), grayscale conversion, noise reduction (Gaussian Blur), and pixel normalization.*
 
-### 3. Training the Model
+### 3. Executing the Training
 
-Simply point the entry script to your training and testing directories:
+To begin training, execute the `main.py` script and provide the paths to your training and testing directories using the `--train_dirs` and `--test_dirs` arguments.
 
+**Basic Training Command**:
 ```bash
 python main.py --train_dirs "path/to/Dataset1/Train" "path/to/Dataset2/Train" --test_dirs "path/to/Dataset1/Test" "path/to/Dataset2/Test"
 ```
 
-**Optional Hyperparameters & Checkpointing**:
-- `--epochs`: Number of training iterations (default: `10`).
-- `--batch_size`: Mini-batch size (default: `32`).
-- `--lr`: Adam optimizer learning rate (default: `0.001`).
-- `--device`: Target processing unit (`cuda` or `cpu`). The script prioritizes GPU if correctly installed.
-- `--save_path`: Where to save the final `pth` state dictionary.
-- `--checkpoint_path`: Where to save/load intermediate epoch training checkpoints.
-- `--resume`: Add this flag to automatically resume training from the latest checkpoint if training was interrupted.
+**Optional Hyperparameters and Settings**:
+You can heavily customize the training process using the following arguments:
+- `--epochs`: Number of full training iterations over the dataset (default: `10`).
+- `--batch_size`: Number of images processed simultaneously before updating weights (default: `32`).
+- `--lr`: Learning rate for the Adam optimizer (default: `0.001`).
+- `--device`: Target processing unit (`cuda` or `cpu`). The script will automatically prioritize the GPU if it is correctly installed.
 
-Example Resuming Command:
+**Checkpointing and Resuming**:
+The framework automatically saves your progress after every epoch.
+- `--save_path`: Destination to save the final trained `pth` model dictionary.
+- `--checkpoint_path`: Destination to continuously save intermediate epoch checkpoints.
+- `--resume`: Include this flag to automatically load the latest checkpoint and resume training from the exact epoch it was interrupted.
+
+**Example Resuming Command**:
 ```bash
 python main.py --train_dirs "path/Train" --test_dirs "path/Test" --resume
 ```
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
-- `main.py`: The CLI entry point orchestrating dataset loading, training, and testing.
-- `model.py`: Contains the `WDSNet` PyTorch architecture (CNN, LSTM, Fusion).
-- `dataset.py`: Houses the `UniversalDataset` class for generalized directory parsing and preprocessing.
-- `train.py`: The core training loop applying the Categorical Cross-Entropy criterion and Adam optimizer.
-- `evaluate.py`: The testing execution loop capturing logic for multi-class metrics (Scikit-Learn).
-- `utils.py`: Helper formulas for statistical Global Feature extraction and matplotlib plotting.
+- `main.py`: The CLI entry point orchestrating dataset combination, training execution, and testing initialization.
+- `model.py`: Contains the `WDSNet` PyTorch architecture (CNN, LSTM, and Fusion layers).
+- `dataset.py`: Houses the `UniversalDataset` class for generalized directory parsing and automated preprocessing.
+- `train.py`: The core training loop applying the Categorical Cross-Entropy loss criterion and Adam optimizer.
+- `evaluate.py`: The testing execution loop capturing logic for comprehensive multi-class metrics (via Scikit-Learn).
+- `utils.py`: Analytical helper formulas for statistical Global Feature extraction, plotting, and checkpoint management.
 
 ---
 
-## 📊 Outputs & Visualizations
+## Outputs and Visualizations
 
-After training completes, the framework performs inference on the test set and drops two visualization files in your root directory:
-1. `training_curves.png`: Loss decay and validation accuracy growth over epochs.
-2. `confusion_matrix.png`: A Seaborn heatmap detailing true vs. predicted class overlap to highlight structural similarities.
-3. `roc_curves.png`: AUC analysis mapping FPR vs TPR (if enabled in `evaluate.py`).
+After the training phase concludes, the framework performs a final inference pass on the test set and generates visualization files in your root directory:
+1. `training_curves.png`: A dual-axis plot illustrating loss decay alongside validation accuracy growth across all epochs.
+2. `confusion_matrix.png`: A Seaborn heatmap detailing true labels versus predicted class overlap, useful for highlighting specific structural similarities between classes.
+3. `roc_curves.png`: An Area Under the Curve (AUC) analysis mapping the False Positive Rate versus the True Positive Rate (if explicitly enabled in the `evaluate.py` script).
